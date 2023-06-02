@@ -23,7 +23,12 @@ model User {
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
   accounts      Account[]
-  sessions      Session[]
+  messages      Message[]
+  friends       Friend[]
+  adminOf       Group[] @relation(name: "admin")
+  groupIds      String[] @db.ObjectId
+  groups        Group[] @relation(fields: [groupIds], references: [id]) 
+ 
 }
 
 
@@ -47,11 +52,34 @@ model Account {
   @@unique([provider, providerAccountId])
 }
 
-model Session {
-  id      String   @id @default(auto()) @map("_id") @db.ObjectId
-  sessionToken String   @unique
-  userId       String @db.ObjectId
-  expires      DateTime
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+model Group {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  title       String   
+  description String
+  createdAt   DateTime @default(now())
+  upDatedAt   DateTime @updatedAt
+  adminId     String @db.ObjectId
+  admin       User @relation(fields: [adminId], references: [id], name: "admin")
+  userIds     String[] @db.ObjectId
+  users       User[] @relation(fields: [userIds], references: [id])
+  messagesId  String[] @db.ObjectId
+  messages    Message[] 
+  
 }
 
+model Message {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  createdAt   DateTime @default(now())
+  user      User @relation(fields: [userId], references: [id])
+  userId    String @db.ObjectId
+  group     Group @relation(fields: [groupId], references: [id])
+  groupId   String @db.ObjectId
+
+}
+
+model Friend {
+  id          String   @id @default(auto()) @map("_id") @db.ObjectId
+  userId      String @db.ObjectId
+  user        User @relation(fields: [userId], references: [id])
+
+}

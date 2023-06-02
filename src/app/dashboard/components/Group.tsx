@@ -1,4 +1,6 @@
 const Group = ({ title }: { title: string }) => {
+  console.log(title);
+
   return (
     <div className="flex items-center gap-2 justify-between hover:cursor-pointer rounded-md p-2  hover:bg-gray-200 hover:bg-opacity-20">
       <div className="p-2 flex items-center bg-[#252329] rounded-lg text-white justify-center  w-[42px]">

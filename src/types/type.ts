@@ -12,3 +12,10 @@ export interface SocialButtonType {
   onClick: () => void;
   provider: string;
 }
+
+export interface GroupType {
+  id: string;
+  title: string;
+  description: string;
+  createdAt: String;
+}

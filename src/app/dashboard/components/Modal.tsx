@@ -2,12 +2,28 @@ import { Dialog, Transition } from "@headlessui/react";
 import { Fragment, useState } from "react";
 import { IconContext } from "react-icons/lib";
 import { AiOutlinePlus } from "react-icons/ai";
+import clsx from "clsx";
 
 export default function MyModal() {
-  let [isOpen, setIsOpen] = useState(false);
+  const [isOpen, setIsOpen] = useState(false);
+  const [channelName, setChannelName] = useState({ name: "", description: "" });
+  const [loading, setLoading] = useState(false);
 
   function closeModal() {
-    setIsOpen(false);
+    setLoading(true);
+    if (channelName.name && channelName.description) {
+      fetch("/api/channel", {
+        method: "POST",
+        body: JSON.stringify(channelName),
+      }).finally(() => {
+        setChannelName({ name: "", description: "" });
+        setIsOpen(false);
+        setLoading(false);
+      });
+    } else {
+      setLoading(false);
+      setIsOpen(false);
+    }
   }
 
   function openModal() {
@@ -64,11 +80,22 @@ export default function MyModal() {
                   </Dialog.Title>
                   <div className="mt-2 relative flex flex-col gap-3">
                     <input
+                      onChange={(e) =>
+                        setChannelName({ ...channelName, name: e.target.value })
+                      }
+                      value={channelName.name}
                       type="text"
                       placeholder="Channel Name"
                       className="w-full bg-[#3C393F] outline-none rounded-md p-3 text-white"
                     />
                     <textarea
+                      onChange={(e) =>
+                        setChannelName({
+                          ...channelName,
+                          description: e.target.value,
+                        })
+                      }
+                      value={channelName.description}
                       placeholder="Channel Description"
                       className="w-full bg-[#3C393F] outline-none rounded-md p-3 text-white"
                     />
@@ -76,8 +103,12 @@ export default function MyModal() {
 
                   <div className="mt-4 w-full flex justify-end">
                     <button
+                      disabled={loading}
                       type="button"
-                      className="inline-flex justify-center   text-[#F2F2F2] rounded-md border border-transparent bg-[#2F80ED] px-4 py-2 text-sm font-medium  hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2"
+                      className={clsx(
+                        "inline-flex justify-center   text-[#F2F2F2] rounded-md border border-transparent bg-[#2F80ED] px-4 py-2 text-sm font-medium  hover:bg-blue-200 focus:outline-none focus-visible:ring-2 focus-visible:ring-blue-500 focus-visible:ring-offset-2",
+                        loading && "bg-blue-300"
+                      )}
                       onClick={closeModal}
                     >
                       Save

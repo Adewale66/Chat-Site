@@ -8,7 +8,19 @@ export async function POST(req: NextRequest) {
     const { name, email, password } = body;
 
     if (!name || !email || !password)
-      return new NextResponse("Missing Fields", { status: 400 });
+      return NextResponse.json({ error: "Missing Fields " }, { status: 400 });
+
+    const user = await prisma.user.findUnique({
+      where: {
+        email: email,
+      },
+    });
+
+    if (user)
+      return NextResponse.json(
+        { error: "Email already exists" },
+        { status: 400 }
+      );
 
     const hashedPassword = await bcrypt.hash(password, 12);
     const newUser = await prisma.user.create({
@@ -22,6 +34,6 @@ export async function POST(req: NextRequest) {
     return NextResponse.json(newUser);
   } catch (e) {
     console.log(e, "REGISTRATION ERROR");
-    return new NextResponse("Error", { status: 500 });
+    return NextResponse.json({ error: "Server Error" }, { status: 500 });
   }
 }

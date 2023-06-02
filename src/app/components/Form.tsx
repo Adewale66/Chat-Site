@@ -6,7 +6,6 @@ import { useState, useCallback, useEffect } from "react";
 import clsx from "clsx";
 import { buttonType, inputs } from "@/types/type";
 import { SubmitHandler, useForm } from "react-hook-form";
-import axios from "axios";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
 import toast from "react-hot-toast";
@@ -56,23 +55,36 @@ const Form = () => {
         })
         .finally(() => setIsLoading(false));
     } else {
-      axios.post("/api/register", data).then((res) => {
-        signIn("credentials", {
-          redirect: false,
-          email: data.email,
-          password: data.password,
+      fetch("/api/register", {
+        method: "POST",
+        body: JSON.stringify(data),
+      })
+        .then((res) => res.json())
+        .then((dataReturned) => {
+          if (dataReturned.error) toast.error(dataReturned.error);
+          else {
+            signIn("credentials", {
+              redirect: false,
+              email: data.email,
+              password: data.password,
+            })
+              .then((res) => {
+                if (res?.ok && !res.error) {
+                  toast.success("Welcome to the club");
+                  router.push("/dashboard");
+                } else {
+                  toast.error("Invalid Credentials");
+                }
+              })
+              .catch(() => {
+                toast.error("Server Error");
+              });
+          }
         })
-          .then(() => {
-            toast.success("Welcome to the club");
-            router.push("/dashboard");
-          })
-          .catch((e) => {
-            toast.error(e.response.data.message);
-          })
-          .finally(() => {
-            setIsLoading(false);
-          });
-      });
+        .catch((errors) => {
+          console.log("e", errors);
+        })
+        .finally(() => setIsLoading(false));
     }
   };
 

@@ -20,10 +20,10 @@ const Message = () => {
             yesterday at 1:39PM
           </span>
         </div>
-        <span className="text-[#E0E0E0] ">
+        <p className="text-[#E0E0E0] ">
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Dolorum
           expedita asperiores dolore!
-        </span>
+        </p>
       </div>
     </div>
   );
