@@ -1,7 +1,6 @@
 "use client";
 
 import { QueryClient, QueryClientProvider } from "react-query";
-
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -10,8 +9,12 @@ const queryClient = new QueryClient({
   },
 });
 
-export const AppProviders = ({ children }: { children: React.ReactNode }) => {
+export default function AppProviders({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <QueryClientProvider client={queryClient}>{children}</QueryClientProvider>
   );
-};
+}

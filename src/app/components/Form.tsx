@@ -4,7 +4,6 @@ import { BsGithub } from "react-icons/bs";
 import { FcGoogle } from "react-icons/fc";
 import { useState, useCallback, useEffect } from "react";
 import clsx from "clsx";
-import { buttonType, inputs } from "@/types/type";
 import { SubmitHandler, useForm } from "react-hook-form";
 import { signIn } from "next-auth/react";
 import { useRouter } from "next/navigation";
@@ -12,6 +11,13 @@ import toast from "react-hot-toast";
 import ProviderButton from "./ProviderButton";
 import ProvidersSection from "./ProvidersSection";
 import { useSession } from "next-auth/react";
+
+export type buttonType = "LOGIN" | "REGISTER";
+export interface inputs {
+  name: string;
+  email: string;
+  password: string;
+}
 
 const Form = () => {
   const [variant, setVariant] = useState<buttonType>("LOGIN");

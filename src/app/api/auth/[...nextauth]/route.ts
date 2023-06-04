@@ -4,7 +4,7 @@ import GoogleProvider from "next-auth/providers/google";
 import DiscordProvider from "next-auth/providers/discord";
 import GithubProvider from "next-auth/providers/github";
 import CredentialsProvider from "next-auth/providers/credentials";
-import { prisma } from "@/libs/prismadb";
+import prisma from "@/libs/prismadb";
 import bcrypt from "bcrypt";
 
 export const authOptions: AuthOptions = {

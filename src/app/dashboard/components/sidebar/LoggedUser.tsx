@@ -2,8 +2,8 @@
 
 import { useSession } from "next-auth/react";
 import Image from "next/image";
-import Noprofile from "../../../../public/blank-profile-picture-973460_1280.webp";
-import PopoverData from "./Popover";
+import Noprofile from "../../../../../public/blank-profile-picture-973460_1280.webp";
+import PopoverData from "../Popover";
 
 const LoggedUser = () => {
   const { data: session } = useSession();

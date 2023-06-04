@@ -1,29 +1,36 @@
 import { Dialog, Transition } from "@headlessui/react";
-import { Fragment, useState } from "react";
+import React, { Fragment, useState } from "react";
 import { IconContext } from "react-icons/lib";
 import { AiOutlinePlus } from "react-icons/ai";
 import clsx from "clsx";
+import { toast } from "react-hot-toast";
+import { useMutation } from "react-query";
 
-export default function MyModal() {
+interface Props<T> {
+  children: React.ReactNode;
+  func: (data: T) => Promise<void>;
+  data: T;
+}
+
+export default function MyModal<T>({ children, func, data }: Props<T>) {
   const [isOpen, setIsOpen] = useState(false);
-  const [channelName, setChannelName] = useState({ name: "", description: "" });
   const [loading, setLoading] = useState(false);
-
-  function closeModal() {
-    setLoading(true);
-    if (channelName.name && channelName.description) {
-      fetch("/api/channel", {
-        method: "POST",
-        body: JSON.stringify(channelName),
-      }).finally(() => {
-        setChannelName({ name: "", description: "" });
-        setIsOpen(false);
-        setLoading(false);
-      });
-    } else {
-      setLoading(false);
+  const mutation = useMutation(func, {
+    onSuccess: () => {
+      toast.success("Success");
+    },
+    onSettled: () => {
       setIsOpen(false);
-    }
+      setLoading(false);
+    },
+    onError: () => {
+      toast.error("Error");
+    },
+  });
+
+  async function closeModal() {
+    setLoading(true);
+    await mutation.mutateAsync(data);
   }
 
   function openModal() {
@@ -78,29 +85,7 @@ export default function MyModal() {
                   >
                     New Channel
                   </Dialog.Title>
-                  <div className="mt-2 relative flex flex-col gap-3">
-                    <input
-                      onChange={(e) =>
-                        setChannelName({ ...channelName, name: e.target.value })
-                      }
-                      value={channelName.name}
-                      type="text"
-                      placeholder="Channel Name"
-                      className="w-full bg-[#3C393F] outline-none rounded-md p-3 text-white"
-                    />
-                    <textarea
-                      onChange={(e) =>
-                        setChannelName({
-                          ...channelName,
-                          description: e.target.value,
-                        })
-                      }
-                      value={channelName.description}
-                      placeholder="Channel Description"
-                      className="w-full bg-[#3C393F] outline-none rounded-md p-3 text-white"
-                    />
-                  </div>
-
+                  {children}
                   <div className="mt-4 w-full flex justify-end">
                     <button
                       disabled={loading}

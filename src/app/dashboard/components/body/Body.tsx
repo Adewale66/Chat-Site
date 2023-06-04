@@ -1,9 +1,9 @@
-import Message from "../Message";
+import Message from "./Message";
 
 const Body = () => {
   return (
     <section className="flex flex-col gap-4 w-full">
-      <header className="text-[#E0E0E0] text-base font-bold uppercase max-[475px]:pl-5">
+      <header className="text-[#E0E0E0] text-base font-bold uppercase max-[575px]:pl-6">
         Front end DEvelopers
       </header>
       <section className="flex flex-col gap-5">

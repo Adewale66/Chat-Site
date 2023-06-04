@@ -15,7 +15,7 @@ const SideBarController = ({
       <button
         onClick={() => setHidden(false)}
         className={clsx(
-          "absolute top-3 left-2 z-20  max-[545px]:block",
+          "absolute top-3 left-2 z-20  max-[768px]:block",
           !hidden && "hidden"
         )}
       >
@@ -25,7 +25,7 @@ const SideBarController = ({
       </button>
       <div
         className={clsx(
-          "absolute top-2 z-30 left-[300px] min-[545px]:hidden",
+          "absolute top-2 z-30 left-[300px] min-[768px]:hidden",
           hidden && "hidden"
         )}
       >

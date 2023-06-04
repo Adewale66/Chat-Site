@@ -1,7 +1,7 @@
-import Body from "./components/body/Body";
-import BodyLayout from "./components/body/BodyLayout";
-import InputMessage from "./components/body/InputMessage";
-import Content from "./components/body/Content";
+import Body from "../components/body/Body";
+import BodyLayout from "../components/body/BodyLayout";
+import InputMessage from "../components/body/InputMessage";
+import Content from "../components/body/Content";
 
 const Page = () => {
   return (
