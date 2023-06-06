@@ -1,36 +1,60 @@
+"use client";
+
 import { IconContext } from "react-icons";
 import { AiOutlineSearch } from "react-icons/ai";
 import Group from "./Group";
 import MyModal from "../Modal";
-import { getGroup } from "@/actions/getGroup";
+import { getGroup } from "@/actions/getGroups";
 import { useQuery } from "react-query";
 import { useMemo, useState } from "react";
 import { addGroup } from "@/actions/createGroup";
+
+interface Member {
+  id: string;
+  name: string;
+  email: string;
+  image: string;
+}
+
+interface AdminProp {
+  id: string;
+  name: string;
+  email: string;
+}
 
 export interface GroupType {
   id: string;
   title: string;
   description: string;
   createdAt: String;
+  admin: AdminProp;
+  members: Member[];
 }
 
 const SidebarMainContent = () => {
   const { isLoading, data } = useQuery("groups", getGroup);
+  const [filter, setFilterGroup] = useState("");
   const groups: GroupType[] = useMemo(() => data, [data]);
   const [channelName, setChannelName] = useState({ name: "", description: "" });
 
   if (isLoading) return <div className="text-white">Loading...</div>;
+  function clearData() {
+    setChannelName({ name: "", description: "" });
+  }
 
   return (
     <>
       <div className="flex items-center justify-between shadow border-b-2 border-gray-600    p-3">
         <span className=" font-bold text-xl text-[#E0E0E0]">Channels</span>
         <MyModal
+          title="channel"
           func={addGroup}
           data={{
             name: channelName.name,
             description: channelName.description,
           }}
+          clearData={clearData}
+          invalidate="groups"
         >
           <div className="mt-2 relative flex flex-col gap-3">
             <input
@@ -67,12 +91,18 @@ const SidebarMainContent = () => {
           type="text"
           placeholder="Search"
           className="pl-2 w-full outline-none border-none bg-[#3C393F] text-white"
+          value={filter}
+          onChange={(e) => setFilterGroup(e.target.value)}
         />
       </div>
-      {groups &&
-        groups.map((group) => {
-          return <Group title={group.title} key={group.id} />;
-        })}
+      <div className="overflow-y-auto h-[330px]">
+        {groups &&
+          groups
+            .filter((e) => e.title.includes(filter))
+            .map((group) => {
+              return <Group title={group.title} key={group.id} />;
+            })}
+      </div>
     </>
   );
 };

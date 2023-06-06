@@ -4,20 +4,32 @@ import { IconContext } from "react-icons/lib";
 import { AiOutlinePlus } from "react-icons/ai";
 import clsx from "clsx";
 import { toast } from "react-hot-toast";
-import { useMutation } from "react-query";
+import { useMutation, useQueryClient } from "react-query";
 
 interface Props<T> {
   children: React.ReactNode;
   func: (data: T) => Promise<void>;
   data: T;
+  clearData: () => void;
+  invalidate: string;
+  title: string;
 }
 
-export default function MyModal<T>({ children, func, data }: Props<T>) {
+export default function MyModal<T>({
+  children,
+  func,
+  title,
+  data,
+  clearData,
+  invalidate,
+}: Props<T>) {
+  const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const mutation = useMutation(func, {
     onSuccess: () => {
       toast.success("Success");
+      queryClient.invalidateQueries(invalidate);
     },
     onSettled: () => {
       setIsOpen(false);
@@ -28,9 +40,29 @@ export default function MyModal<T>({ children, func, data }: Props<T>) {
     },
   });
 
+  console.log(loading);
+
+  function itemsNotEmpty(data: T) {
+    for (const k in data) {
+      if (!data[k]) return false;
+    }
+    return true;
+  }
+
   async function closeModal() {
     setLoading(true);
-    await mutation.mutateAsync(data);
+
+    if (itemsNotEmpty(data)) {
+      await mutation.mutateAsync(data);
+    } else {
+      setIsOpen(false);
+      setLoading(false);
+    }
+  }
+
+  function handleClose() {
+    clearData();
+    setIsOpen(false);
   }
 
   function openModal() {
@@ -45,16 +77,16 @@ export default function MyModal<T>({ children, func, data }: Props<T>) {
           color: "white",
         }}
       >
-        <div
-          className="bg-[#3C393F] hover:cursor-pointer p-2 rounded-lg"
+        <button
+          className="bg-[#3C393F]  p-2 max-w-[35px] flex justify-center rounded-lg"
           onClick={openModal}
         >
           <AiOutlinePlus />
-        </div>
+        </button>
       </IconContext.Provider>
 
       <Transition appear show={isOpen} as={Fragment}>
-        <Dialog as="div" className="relative z-40" onClose={closeModal}>
+        <Dialog as="div" className="relative z-40" onClose={handleClose}>
           <Transition.Child
             as={Fragment}
             enter="ease-out duration-300"
@@ -78,12 +110,12 @@ export default function MyModal<T>({ children, func, data }: Props<T>) {
                 leaveFrom="opacity-100 scale-100"
                 leaveTo="opacity-0 scale-95"
               >
-                <Dialog.Panel className="w-full max-w-md transform overflow-hidden rounded-2xl bg-[#120F13] p-6 text-left align-middle shadow-xl transition-all">
+                <Dialog.Panel className="w-full max-w-md overflow-y-auto transform overflow-hidden rounded-2xl bg-[#120F13] p-6 text-left align-middle shadow-xl transition-all">
                   <Dialog.Title
                     as="h3"
                     className="text-base font-bold leading-6 uppercase text-white"
                   >
-                    New Channel
+                    New {title}
                   </Dialog.Title>
                   {children}
                   <div className="mt-4 w-full flex justify-end">

@@ -41,11 +41,11 @@ export async function POST(req: NextRequest) {
         },
       });
     } catch (error) {
-      console.log("error", error);
+      return NextResponse.json({ message: "error" }, { status: 400 });
     }
+    return NextResponse.json({ message: "ok" }, { status: 200 });
   }
-
-  return NextResponse.json({ message: "ok" }, { status: 200 });
+  return NextResponse.json({ message: "not authorized" }, { status: 401 });
 }
 
 export async function GET(req: NextRequest) {
@@ -53,6 +53,16 @@ export async function GET(req: NextRequest) {
   const token = await getToken({ req });
   if (token && token?.name === user?.user?.name) {
     const groups = await prisma.group.findMany({
+      include: {
+        messages: {
+          include: {
+            user: true,
+          },
+        },
+        users: true,
+        admin: true,
+      },
+
       where: {
         userIds: {
           has: token.id as string,
@@ -61,5 +71,61 @@ export async function GET(req: NextRequest) {
     });
     return NextResponse.json(groups, { status: 200 });
   }
+  return NextResponse.json({ message: "not authorized" }, { status: 401 });
+}
+
+export async function DELETE(req: NextRequest) {
+  const token = await getToken({ req });
+  const { searchParams } = new URL(req.url);
+  const groupId = searchParams.get("id");
+  const user = await getSession();
+
+  if (token && token?.name === user?.user?.name) {
+    try {
+      const group = await prisma.group.findUnique({
+        where: {
+          id: groupId as string,
+        },
+      });
+
+      if (group) {
+        const users = group.userIds;
+
+        for (const u of users) {
+          const user = await prisma.user.findUnique({
+            where: {
+              id: u,
+            },
+          });
+
+          if (user) {
+            const updatedUserGroupIds = user.groupIds.filter(
+              (id: string) => id !== groupId
+            );
+
+            await prisma.user.update({
+              where: {
+                id: user.id,
+              },
+              data: {
+                groupIds: {
+                  push: updatedUserGroupIds,
+                },
+              },
+            });
+          }
+        }
+        await prisma.group.delete({
+          where: {
+            id: groupId as string,
+          },
+        });
+      }
+      return NextResponse.json({ message: "ok" }, { status: 200 });
+    } catch (error) {
+      return NextResponse.json({ message: "Server Error" }, { status: 500 });
+    }
+  }
+
   return NextResponse.json({ message: "not authorized" }, { status: 401 });
 }

@@ -1,7 +1,7 @@
 import Image from "next/image";
 import dummyimg from "../../../../../public/blank-profile-picture-973460_1280.webp";
 
-const Members = () => {
+const Members = ({ img }: { img: string }) => {
   return (
     <div className=" w-full">
       <Image
