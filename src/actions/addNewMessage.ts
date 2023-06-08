@@ -2,9 +2,9 @@ export async function addNewMessage(data: {
   message: string;
   groupId: string;
 }) {
-  const res = await fetch("/api/message", {
+  const res = await fetch(`/api/message/${data.groupId}`, {
     method: "PATCH",
-    body: JSON.stringify(data),
+    body: JSON.stringify({ message: data.message }),
   });
   return await res.json();
 }

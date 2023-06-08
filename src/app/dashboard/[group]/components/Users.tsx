@@ -1,6 +1,6 @@
 import { Dispatch, SetStateAction, useState } from "react";
 import { Transition } from "@headlessui/react";
-import { Userprops } from "../../components/body/Groupmemebers";
+import { Userprops } from "@/types/type";
 
 const SearchInputDropdown = ({
   options,
@@ -25,7 +25,6 @@ const SearchInputDropdown = ({
 
   function filterUsers(name: string) {
     const filteredUser = options?.find((d) => d.name === name);
-    console.log(filteredUser);
 
     setData({ groupId: groupId as string, userId: filteredUser?.id as string });
   }

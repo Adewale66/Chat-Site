@@ -4,8 +4,8 @@ import prisma from "@/libs/prismadb";
 
 export async function PATCH(req: NextRequest) {
   const token = await getToken({ req });
-  const body = await req.json();
-  const { message, groupId } = body;
+  const { message } = await req.json();
+  const groupId = req.url.slice(req.url.lastIndexOf("/") + 1);
 
   if (token) {
     try {
@@ -29,7 +29,6 @@ export async function PATCH(req: NextRequest) {
       });
       return NextResponse.json("Message sent", { status: 200 });
     } catch (e: any) {
-      console.log("server error");
       return new Response(e.message, { status: 500 });
     }
   }

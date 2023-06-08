@@ -4,42 +4,30 @@ import { IconContext } from "react-icons";
 import { AiOutlineSearch } from "react-icons/ai";
 import Group from "./Group";
 import MyModal from "../Modal";
-import { getGroup } from "@/actions/getGroups";
+import { getGroups } from "@/actions/getGroups";
 import { useQuery } from "react-query";
-import { useMemo, useState } from "react";
+import { useState } from "react";
 import { addGroup } from "@/actions/createGroup";
-
-interface Member {
-  id: string;
-  name: string;
-  email: string;
-  image: string;
-}
-
-interface AdminProp {
-  id: string;
-  name: string;
-  email: string;
-}
-
-export interface GroupType {
-  id: string;
-  title: string;
-  description: string;
-  createdAt: String;
-  admin: AdminProp;
-  members: Member[];
-}
+import { GroupType } from "@/types/type";
+import LoadingSidebar from "./LoadingSidebar";
 
 const SidebarMainContent = () => {
-  const { isLoading, data } = useQuery("groups", getGroup);
+  const { isLoading, data: groups } = useQuery<GroupType[]>(
+    "groups",
+    getGroups
+  );
   const [filter, setFilterGroup] = useState("");
-  const groups: GroupType[] = useMemo(() => data, [data]);
-  const [channelName, setChannelName] = useState({ name: "", description: "" });
+  const [channelName, setChannelName] = useState({ name: "" });
 
-  if (isLoading) return <div className="text-white">Loading...</div>;
+  if (isLoading)
+    return (
+      <div className="text-white flex justify-center items-center min-h-screen">
+        <LoadingSidebar />
+      </div>
+    );
+
   function clearData() {
-    setChannelName({ name: "", description: "" });
+    setChannelName({ name: "" });
   }
 
   return (
@@ -51,7 +39,6 @@ const SidebarMainContent = () => {
           func={addGroup}
           data={{
             name: channelName.name,
-            description: channelName.description,
           }}
           clearData={clearData}
           invalidate="groups"
@@ -64,17 +51,6 @@ const SidebarMainContent = () => {
               value={channelName.name}
               type="text"
               placeholder="Channel Name"
-              className="w-full bg-[#3C393F] outline-none rounded-md p-3 text-white"
-            />
-            <textarea
-              onChange={(e) =>
-                setChannelName({
-                  ...channelName,
-                  description: e.target.value,
-                })
-              }
-              value={channelName.description}
-              placeholder="Channel Description"
               className="w-full bg-[#3C393F] outline-none rounded-md p-3 text-white"
             />
           </div>

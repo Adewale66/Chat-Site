@@ -15,10 +15,9 @@ const InputMessage = ({ groupId }: { groupId: string | undefined }) => {
     },
     {
       onSuccess: () => {
-        toast.success("Message sent");
-        queryClient.invalidateQueries("data");
+        queryClient.invalidateQueries("group");
       },
-      onError: (e) => {
+      onError: () => {
         toast.error("Something went wrong");
       },
       onSettled: () => {
@@ -34,7 +33,6 @@ const InputMessage = ({ groupId }: { groupId: string | undefined }) => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsSending(true);
-    console.log(groupId);
 
     if (groupId && message) {
       mutation.mutate({

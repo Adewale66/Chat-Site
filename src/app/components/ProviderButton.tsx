@@ -1,10 +1,4 @@
-import { IconType } from "react-icons/lib";
-
-export interface SocialButtonType {
-  icon: IconType;
-  onClick: () => void;
-  provider: string;
-}
+import { SocialButtonType } from "@/types/type";
 
 const ProviderButton: React.FC<SocialButtonType> = ({
   icon: Icon,

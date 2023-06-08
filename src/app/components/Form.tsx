@@ -11,13 +11,7 @@ import toast from "react-hot-toast";
 import ProviderButton from "./ProviderButton";
 import ProvidersSection from "./ProvidersSection";
 import { useSession } from "next-auth/react";
-
-export type buttonType = "LOGIN" | "REGISTER";
-export interface inputs {
-  name: string;
-  email: string;
-  password: string;
-}
+import { buttonType, inputs } from "@/types/type";
 
 const Form = () => {
   const [variant, setVariant] = useState<buttonType>("LOGIN");

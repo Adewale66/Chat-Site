@@ -5,29 +5,27 @@ import BodyLayout from "../components/body/BodyLayout";
 import InputMessage from "../components/body/InputMessage";
 import Content from "../components/body/Groupmemebers";
 import { getGroup } from "@/actions/getGroups";
-import { useMemo } from "react";
 import { useQuery } from "react-query";
-import { GroupType } from "../components/sidebar/SidebarContent";
+import { GroupType } from "@/types/type";
+import NotFound from "./components/NotFound";
 
 const Page = ({ params }: { params: { group: string } }) => {
-  const groupName = params.group.replace("-", " ");
-  const { isLoading, data } = useQuery<GroupType[]>("groups", getGroup, {
-    placeholderData: [],
-  });
-  const group: GroupType | undefined = useMemo(
-    () => data?.find((d) => d.title === groupName),
-    [data, groupName]
-  );
+  const groupName = params.group.replaceAll("%20", " ");
 
-  console.log(group?.members);
+  const {
+    isLoading,
+    error,
+    data: group,
+  } = useQuery<GroupType>("group", () => getGroup(groupName));
 
-  if (isLoading) return <div>Loading...</div>;
-  console.log(group);
+  if (isLoading) return <div>Loading...here</div>;
+
+  if (group?.message === "not found") return <NotFound />;
 
   return (
     <div className="w-full max-[765px]:absolute flex ">
       <BodyLayout>
-        <Body id={group?.id} />
+        <Body messages={group?.messages} title={group?.title as string} />
         <InputMessage groupId={group?.id} />
       </BodyLayout>
       <Content group={group} />

@@ -4,21 +4,13 @@ import Members from "./Members";
 import { useQuery } from "react-query";
 import { useMemo, useState } from "react";
 import { getUsers } from "@/actions/getAllUsers";
-import { GroupType } from "../sidebar/SidebarContent";
 import MyModal from "../Modal";
 import Example from "../../[group]/components/Users";
 import { AddUserToGroup } from "@/actions/addMember";
 import DeleteGroup from "../../[group]/components/DeleteGroup";
 import { useSession } from "next-auth/react";
-
-export interface Userprops {
-  id: string;
-  name: string;
-  email: string;
-  image: string;
-  groupIds: string[];
-  groups: GroupType[];
-}
+import { GroupType, Userprops } from "@/types/type";
+import LoadingSidebar from "../sidebar/LoadingSidebar";
 
 const Content = ({ group }: { group: GroupType | undefined }) => {
   const { isLoading, data } = useQuery<Userprops[]>("users", getUsers);
@@ -32,17 +24,20 @@ const Content = ({ group }: { group: GroupType | undefined }) => {
     userId: "",
     groupId: "",
   });
-  console.log(data);
 
   const adminUser = group?.admin.email === loggedUser?.data?.user?.email;
+
   const members = useMemo<Userprops[] | undefined>(
     () => data?.filter((d) => d.groupIds.includes(group?.id as string)),
     [data, group?.id]
   );
 
-  if (isLoading) return <div>Loading...</div>;
-  console.log("adin", adminUser);
-  console.log("members", members);
+  if (isLoading)
+    return (
+      <div className="text-white flex justify-center items-center min-h-screen">
+        <LoadingSidebar />
+      </div>
+    );
 
   function clearInput() {
     setDataToAdd({
@@ -50,7 +45,6 @@ const Content = ({ group }: { group: GroupType | undefined }) => {
       userId: "",
     });
   }
-  console.log(dataToAdd);
 
   return (
     <div className=" bg-black px-4 py-3 flex flex-col items-center  gap-4 ">

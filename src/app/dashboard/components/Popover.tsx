@@ -65,12 +65,7 @@ const PopoverData = () => {
                   </IconContext.Provider>
                   <span className="text-white">Profile</span>
                 </div>
-                <div className="flex items-center gap-3 hover:cursor-pointer p-2 hover:bg-gray-600 rounded-md">
-                  <IconContext.Provider value={{ color: "white" }}>
-                    <FaUserFriends />
-                  </IconContext.Provider>
-                  <span className="text-white">Friends</span>
-                </div>
+
                 <hr className="border-gray-300" />
                 <div
                   className="flex items-center gap-3 hover:cursor-pointer"

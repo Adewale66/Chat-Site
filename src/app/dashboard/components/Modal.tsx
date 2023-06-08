@@ -5,15 +5,8 @@ import { AiOutlinePlus } from "react-icons/ai";
 import clsx from "clsx";
 import { toast } from "react-hot-toast";
 import { useMutation, useQueryClient } from "react-query";
-
-interface Props<T> {
-  children: React.ReactNode;
-  func: (data: T) => Promise<void>;
-  data: T;
-  clearData: () => void;
-  invalidate: string;
-  title: string;
-}
+import { Props } from "@/types/type";
+import { useRouter } from "next/navigation";
 
 export default function MyModal<T>({
   children,
@@ -26,10 +19,14 @@ export default function MyModal<T>({
   const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+  let route = "";
+  const router = useRouter();
   const mutation = useMutation(func, {
     onSuccess: () => {
       toast.success("Success");
       queryClient.invalidateQueries(invalidate);
+      clearData();
+      if (invalidate === "groups") router.push(`/dashboard/${route}`);
     },
     onSettled: () => {
       setIsOpen(false);
@@ -40,11 +37,10 @@ export default function MyModal<T>({
     },
   });
 
-  console.log(loading);
-
   function itemsNotEmpty(data: T) {
     for (const k in data) {
       if (!data[k]) return false;
+      route = data[k] as string;
     }
     return true;
   }
