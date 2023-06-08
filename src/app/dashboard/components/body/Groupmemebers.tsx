@@ -1,6 +1,5 @@
 "use client";
 
-import Members from "./Members";
 import { useQuery } from "react-query";
 import { useMemo, useState } from "react";
 import { getUsers } from "@/actions/getAllUsers";
@@ -11,6 +10,8 @@ import DeleteGroup from "../../[group]/components/DeleteGroup";
 import { useSession } from "next-auth/react";
 import { GroupType, Userprops } from "@/types/type";
 import LoadingSidebar from "../sidebar/LoadingSidebar";
+import UserProfile from "../../[group]/components/RemoveUser";
+import clsx from "clsx";
 
 const Content = ({ group }: { group: GroupType | undefined }) => {
   const { isLoading, data } = useQuery<Userprops[]>("users", getUsers);
@@ -31,10 +32,9 @@ const Content = ({ group }: { group: GroupType | undefined }) => {
     () => data?.filter((d) => d.groupIds.includes(group?.id as string)),
     [data, group?.id]
   );
-
   if (isLoading)
     return (
-      <div className="text-white flex justify-center items-center min-h-screen">
+      <div className="text-white flex pl-2 justify-center items-center min-h-screen bg-black">
         <LoadingSidebar />
       </div>
     );
@@ -47,7 +47,12 @@ const Content = ({ group }: { group: GroupType | undefined }) => {
   }
 
   return (
-    <div className=" bg-black px-4 py-3 flex flex-col items-center  gap-4 ">
+    <div
+      className={clsx(
+        " bg-black px-4 py-3 flex flex-col items-center  gap-4 relative z-10",
+        !adminUser && "pt-12"
+      )}
+    >
       {adminUser && (
         <MyModal
           title="User"
@@ -63,7 +68,15 @@ const Content = ({ group }: { group: GroupType | undefined }) => {
           />
         </MyModal>
       )}
-      {members && members.map((d, i) => <Members key={i} img={d.image} />)}
+      {members &&
+        members.map((d, i) => (
+          <UserProfile
+            key={i}
+            user={d}
+            admin={group?.admin}
+            groupId={group?.id}
+          />
+        ))}
       {adminUser && (
         <DeleteGroup
           groupId={group?.id as string}

@@ -18,10 +18,9 @@ const SidebarMainContent = () => {
   );
   const [filter, setFilterGroup] = useState("");
   const [channelName, setChannelName] = useState({ name: "" });
-
   if (isLoading)
     return (
-      <div className="text-white flex justify-center items-center min-h-screen">
+      <div className="text-white flex justify-center items-center  grow">
         <LoadingSidebar />
       </div>
     );
