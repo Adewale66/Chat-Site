@@ -17,7 +17,9 @@ const Page = ({ params }: { params: { group: string } }) => {
     isLoading,
     error,
     data: group,
-  } = useQuery<GroupType>("group", () => getGroup(groupName));
+  } = useQuery<GroupType>("group", () => getGroup(groupName), {
+    staleTime: 20000,
+  });
 
   if (isLoading)
     return (

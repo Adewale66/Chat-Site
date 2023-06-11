@@ -4,8 +4,9 @@ import { addNewMessage } from "@/actions/addNewMessage";
 import { AiOutlineSend } from "react-icons/ai";
 import { IconContext } from "react-icons/lib";
 import { useMutation, useQueryClient } from "react-query";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
+import { pusherClient } from "@/libs/pusherlib";
 
 const InputMessage = ({ groupId }: { groupId: string | undefined }) => {
   const queryClient = useQueryClient();
@@ -14,9 +15,7 @@ const InputMessage = ({ groupId }: { groupId: string | undefined }) => {
       return addNewMessage(newMessage);
     },
     {
-      onSuccess: () => {
-        queryClient.invalidateQueries("group");
-      },
+      onSuccess: () => {},
       onError: () => {
         toast.error("Something went wrong");
       },
@@ -29,6 +28,20 @@ const InputMessage = ({ groupId }: { groupId: string | undefined }) => {
 
   const [message, setMessage] = useState("");
   const [isSending, setIsSending] = useState(false);
+
+  useEffect(() => {
+    const channel = pusherClient.subscribe("messages");
+
+    channel.bind("new-message", (data: any) => {
+      console.log("new message", data);
+      queryClient.invalidateQueries("group");
+    });
+
+    return () => {
+      channel.unbind("new-message");
+      pusherClient.unsubscribe("messages");
+    };
+  }, [queryClient]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

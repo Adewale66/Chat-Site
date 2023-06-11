@@ -1,5 +1,5 @@
 import { Dialog, Transition } from "@headlessui/react";
-import React, { Fragment, useState } from "react";
+import { Fragment, useState } from "react";
 import { IconContext } from "react-icons/lib";
 import { AiOutlinePlus } from "react-icons/ai";
 import clsx from "clsx";
@@ -19,6 +19,7 @@ export default function MyModal<T>({
   const queryClient = useQueryClient();
   const [isOpen, setIsOpen] = useState(false);
   const [loading, setLoading] = useState(false);
+
   let route = "";
   const router = useRouter();
   const mutation = useMutation(func, {

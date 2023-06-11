@@ -1,11 +1,11 @@
 import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/libs/prismadb";
+import { pusherServer } from "@/libs/pusherlib";
 
-export async function PATCH(req: NextRequest) {
+export async function POST(req: NextRequest) {
   const token = await getToken({ req });
-  const { message } = await req.json();
-  const groupId = req.url.slice(req.url.lastIndexOf("/") + 1);
+  const { message, groupId } = await req.json();
 
   if (token) {
     try {
@@ -27,6 +27,7 @@ export async function PATCH(req: NextRequest) {
           },
         },
       });
+      await pusherServer.trigger("messages", "new-message", message);
       return NextResponse.json("Message sent", { status: 200 });
     } catch (e: any) {
       return new Response(e.message, { status: 500 });
