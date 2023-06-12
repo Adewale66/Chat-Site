@@ -7,6 +7,7 @@ import { useMutation, useQueryClient } from "react-query";
 import { useState, useEffect } from "react";
 import { toast } from "react-hot-toast";
 import { pusherClient } from "@/libs/pusherlib";
+import { MessageProp } from "@/types/type";
 
 const InputMessage = ({ groupId }: { groupId: string | undefined }) => {
   const queryClient = useQueryClient();
@@ -15,7 +16,9 @@ const InputMessage = ({ groupId }: { groupId: string | undefined }) => {
       return addNewMessage(newMessage);
     },
     {
-      onSuccess: () => {},
+      onSuccess: () => {
+        queryClient.invalidateQueries("messages");
+      },
       onError: () => {
         toast.error("Something went wrong");
       },
@@ -30,18 +33,24 @@ const InputMessage = ({ groupId }: { groupId: string | undefined }) => {
   const [isSending, setIsSending] = useState(false);
 
   useEffect(() => {
-    const channel = pusherClient.subscribe("messages");
+    const channel = pusherClient.subscribe(groupId!);
 
     channel.bind("new-message", (data: any) => {
-      console.log("new message", data);
-      queryClient.invalidateQueries("group");
+      queryClient.setQueryData(
+        "messages",
+        (prevData: MessageProp[] | undefined) => {
+          if (prevData) return [...prevData, data];
+          return [data];
+        }
+      );
     });
 
     return () => {
       channel.unbind("new-message");
       pusherClient.unsubscribe("messages");
+      pusherClient.disconnect();
     };
-  }, [queryClient]);
+  }, [queryClient, groupId]);
 
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();

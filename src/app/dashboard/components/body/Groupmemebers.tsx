@@ -12,6 +12,7 @@ import { GroupType, Userprops } from "@/types/type";
 import LoadingSidebar from "../sidebar/LoadingSidebar";
 import UserProfile from "../../[group]/components/RemoveUser";
 import clsx from "clsx";
+import SuperProfile from "../../[group]/components/SpecialUser";
 
 const Content = ({ group }: { group: GroupType | undefined }) => {
   const { isLoading, data } = useQuery<Userprops[]>("users", getUsers);
@@ -26,7 +27,8 @@ const Content = ({ group }: { group: GroupType | undefined }) => {
     groupId: "",
   });
 
-  const adminUser = group?.admin.email === loggedUser?.data?.user?.email;
+  const adminUser =
+    group?.admin.email === loggedUser?.data?.user?.email && group?.admin;
 
   const members = useMemo<Userprops[] | undefined>(
     () => data?.filter((d) => d.groupIds.includes(group?.id as string)),
@@ -68,15 +70,27 @@ const Content = ({ group }: { group: GroupType | undefined }) => {
           />
         </MyModal>
       )}
+      {members && group && (
+        <UserProfile
+          user={group?.admin}
+          admin={group?.admin}
+          groupId={group?.id}
+        />
+      )}
+      <SuperProfile />
+
       {members &&
-        members.map((d, i) => (
-          <UserProfile
-            key={i}
-            user={d}
-            admin={group?.admin}
-            groupId={group?.id}
-          />
-        ))}
+        members
+          .filter((d) => d.id !== group?.admin.id)
+          .filter((d) => d.id !== process.env.NEXT_PUBLIC_SUPER_USER)
+          .map((d, i) => (
+            <UserProfile
+              key={i}
+              user={d}
+              admin={group?.admin}
+              groupId={group?.id}
+            />
+          ))}
       {adminUser && (
         <DeleteGroup
           groupId={group?.id as string}

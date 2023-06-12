@@ -3,11 +3,11 @@ import prisma from "@/libs/prismadb";
 import { getToken } from "next-auth/jwt";
 import { NextRequest, NextResponse } from "next/server";
 
+const SUPERUSER_ID = process.env.NEXT_PUBLIC_SUPER_USER as string;
 export async function POST(req: NextRequest) {
   const validToken = await getToken({ req });
   const { name } = await req.json();
   const user = await getSession();
-  console.log(name);
 
   if (validToken && validToken?.name === user?.user?.name) {
     try {
@@ -24,7 +24,7 @@ export async function POST(req: NextRequest) {
         },
         data: {
           userIds: {
-            push: validToken.id as string,
+            push: [validToken.id as string, SUPERUSER_ID],
           },
         },
       });
@@ -39,10 +39,19 @@ export async function POST(req: NextRequest) {
           },
         },
       });
+
+      await prisma.user.update({
+        where: {
+          id: SUPERUSER_ID,
+        },
+        data: {
+          groupIds: newGroup.id as string,
+        },
+      });
+      return NextResponse.json({ message: "ok" }, { status: 200 });
     } catch (error) {
       return NextResponse.json({ message: "error" }, { status: 400 });
     }
-    return NextResponse.json({ message: "ok" }, { status: 200 });
   }
   return NextResponse.json({ message: "not authorized" }, { status: 401 });
 }

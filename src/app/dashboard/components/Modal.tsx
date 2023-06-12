@@ -6,8 +6,6 @@ import clsx from "clsx";
 import { toast } from "react-hot-toast";
 import { useMutation, useQueryClient } from "react-query";
 import { Props } from "@/types/type";
-import { useRouter } from "next/navigation";
-
 export default function MyModal<T>({
   children,
   func,
@@ -21,13 +19,10 @@ export default function MyModal<T>({
   const [loading, setLoading] = useState(false);
 
   let route = "";
-  const router = useRouter();
   const mutation = useMutation(func, {
     onSuccess: () => {
       toast.success("Success");
       queryClient.invalidateQueries(invalidate);
-      clearData();
-      if (invalidate === "groups") router.push(`/dashboard/${route}`);
     },
     onSettled: () => {
       setIsOpen(false);

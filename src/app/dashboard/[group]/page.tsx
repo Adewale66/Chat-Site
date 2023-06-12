@@ -13,13 +13,13 @@ import LoadingData from "./components/LoadingData";
 const Page = ({ params }: { params: { group: string } }) => {
   const groupName = params.group.replaceAll("%20", " ");
 
-  const {
-    isLoading,
-    error,
-    data: group,
-  } = useQuery<GroupType>("group", () => getGroup(groupName), {
-    staleTime: 20000,
-  });
+  const { isLoading, data: group } = useQuery<GroupType>(
+    "group",
+    () => getGroup(groupName),
+    {
+      staleTime: 20000,
+    }
+  );
 
   if (isLoading)
     return (
@@ -33,7 +33,7 @@ const Page = ({ params }: { params: { group: string } }) => {
   return (
     <div className="w-full max-[765px]:absolute flex relative z-10">
       <BodyLayout>
-        <Body messages={group?.messages} title={group?.title as string} />
+        <Body groupId={group?.id as string} title={group?.title as string} />
         <InputMessage groupId={group?.id} />
       </BodyLayout>
       <Content group={group} />
