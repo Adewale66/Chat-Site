@@ -69,7 +69,10 @@ const SuperProfile = () => {
                     <h3 className="text-base font-semibold leading-7 tracking-tight text-gray-900">
                       {"Adewale Kujore"}
                     </h3>
-                    <a href="https://github.com/Adewale66" target="_blank">
+                    <a
+                      href="https://github.com/Adewale66/Chat-Site"
+                      target="_blank"
+                    >
                       <BsGithub className="text-2xl" />
                     </a>
                     <p className="text-sm font-semibold leading-6 text-indigo-600">
